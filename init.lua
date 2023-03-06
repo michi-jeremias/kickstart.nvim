@@ -96,6 +96,11 @@ require('lazy').setup({
     dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' },
   },
 
+  { -- File tree
+    'nvim-tree/nvim-tree.lua',
+    'nvim-tree/nvim-web-devicons',
+  },
+
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim', opts = {} },
   { -- Adds git releated signs to the gutter, as well as utilities for managing changes
@@ -262,6 +267,9 @@ vim.keymap.set('n', '<leader>sv', '<C-w>v')
 vim.keymap.set('n', '<leader>sh', '<C-w>s')
 vim.keymap.set('n', '<leader>sx', ':close<CR>')
 vim.keymap.set('n', '<leader>se', '<C-w>=') -- Make windows equal size
+
+-- Nvim tree toggle (file explorer)
+vim.keymap.set('n', '<leader>b', ':NvimTreeToggle<CR>')
 
 -- Remove highlight
 vim.keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = 'Clear the highlight' })
@@ -462,6 +470,28 @@ local servers = {
     },
   },
 }
+
+-- nvim-tree setup
+require('nvim-tree').setup({
+  renderer = {
+    icons = {
+      glyphs = {
+        folder = {
+          arrow_closed = "+", -- arrow when folder is closed
+          arrow_open = "-", -- arror when folder is open
+        },
+      },
+    },
+  },
+  actions = {
+    open_file = {
+      window_picker = {
+        enable = false
+      }
+    }
+  },
+})
+
 
 -- Setup neovim lua configuration
 require('neodev').setup()
