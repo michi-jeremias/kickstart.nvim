@@ -70,6 +70,9 @@ require('lazy').setup({
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
 
+  -- Tmux integration
+  'christoomey/vim-tmux-navigator',
+
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
