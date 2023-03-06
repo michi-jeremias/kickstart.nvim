@@ -98,6 +98,9 @@ require('lazy').setup({
     -- Autocompletion
     'hrsh7th/nvim-cmp',
     dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' },
+    -- from josean
+    'hrsh7th/cmp-buffer',
+    'hrsh7th/cmp-path',
   },
 
   { -- File tree
@@ -106,7 +109,7 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim',          opts = {} },
+  { 'folke/which-key.nvim', opts = {} },
   {
     -- Adds git releated signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -165,7 +168,7 @@ require('lazy').setup({
   },
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim',         opts = {} },
+  { 'numToStr/Comment.nvim', opts = {} },
 
   -- Fuzzy Finder (files, lsp, etc)
   { 'nvim-telescope/telescope.nvim', version = '*', dependencies = { 'nvim-lua/plenary.nvim' } },
@@ -200,6 +203,9 @@ require('lazy').setup({
 
   -- Auto pairs brackets
   { 'windwp/nvim-autopairs' },
+
+  -- formatting and linting
+  { 'jose-elias-alvarez/null-ls.nvim' },
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -264,7 +270,9 @@ vim.o.timeout = true
 vim.o.timeoutlen = 300
 
 -- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menuone,noselect'
+vim.o.completeopt = 'menuone,noselect,noinsert'
+vim.opt.shortmess = vim.opt.shortmess + { c = true }
+vim.api.nvim_set_option('updatetime', 100)
 
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
@@ -295,21 +303,21 @@ vim.keymap.set('n', '<leader>se', '<C-w>=') -- Make windows equal size
 vim.keymap.set('n', '<leader>b', ':NvimTreeToggle<CR>')
 
 -- Remove highlight
-vim.keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = 'Clear the highlight' })
+vim.keymap.set('n', '<leader>nh', ':nohl<CR>', { desc = 'Clear the highlight' })
 
 -- Keep current line in the middle when scrolling and searching
-vim.keymap.set("n", "<C-d>", "<C-d>zz")
-vim.keymap.set("n", "<C-u>", "<C-u>zz")
-vim.keymap.set("n", "n", "nzzzv")
-vim.keymap.set("n", "N", "Nzzzv")
+vim.keymap.set('n', '<C-d>', '<C-d>zz')
+vim.keymap.set('n', '<C-u>', '<C-u>zz')
+vim.keymap.set('n', 'n', 'nzzzv')
+vim.keymap.set('n', 'N', 'Nzzzv')
 
 -- Delete single char without putting into clipboard
-vim.keymap.set("n", "x", '"_x"')
+vim.keymap.set('n', 'x', '"_x"')
 
 -- Delete word in insert mode
-vim.keymap.set("i", "<C-del>", "<C-o>dw")
-vim.keymap.set("i", "<leader><del>", "<C-o>dw")
-vim.keymap.set("i", "<leader><BS>", "<C-w>")
+vim.keymap.set('i', '<C-del>', '<C-o>dw')
+vim.keymap.set('i', '<leader><del>', '<C-o>dw')
+vim.keymap.set('i', '<leader><BS>', '<C-w>')
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -328,8 +336,8 @@ require('telescope').setup {
   defaults = {
     mappings = {
       i = {
-            ['<C-u>'] = false,
-            ['<C-d>'] = false,
+        ['<C-u>'] = false,
+        ['<C-d>'] = false,
       },
     },
   },
@@ -353,8 +361,7 @@ vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { des
 vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [H]elp' })
 vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
 vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
-vim.keymap.set('n', '<leader>ss', require('telescope.builtin').live_grep,
-  { desc = '[S]earch [S]tring (same as <leader>sg)' })
+vim.keymap.set('n', '<leader>ss', require('telescope.builtin').live_grep, { desc = '[S]earch [S]tring (same as <leader>sg)' })
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 
 -- [[ Configure Treesitter ]]
@@ -383,51 +390,51 @@ require('nvim-treesitter.configs').setup {
       lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
       keymaps = {
         -- You can use the capture groups defined in textobjects.scm
-            ['aa'] = '@parameter.outer',
-            ['ia'] = '@parameter.inner',
-            ['af'] = '@function.outer',
-            ['if'] = '@function.inner',
-            ['ac'] = '@class.outer',
-            ['ic'] = '@class.inner',
+        ['aa'] = '@parameter.outer',
+        ['ia'] = '@parameter.inner',
+        ['af'] = '@function.outer',
+        ['if'] = '@function.inner',
+        ['ac'] = '@class.outer',
+        ['ic'] = '@class.inner',
       },
     },
     move = {
       enable = true,
       set_jumps = true, -- whether to set jumps in the jumplist
       goto_next_start = {
-            [']m'] = '@function.outer',
-            [']]'] = '@class.outer',
+        [']m'] = '@function.outer',
+        [']]'] = '@class.outer',
       },
       goto_next_end = {
-            [']M'] = '@function.outer',
-            [']['] = '@class.outer',
+        [']M'] = '@function.outer',
+        [']['] = '@class.outer',
       },
       goto_previous_start = {
-            ['[m'] = '@function.outer',
-            ['[['] = '@class.outer',
+        ['[m'] = '@function.outer',
+        ['[['] = '@class.outer',
       },
       goto_previous_end = {
-            ['[M'] = '@function.outer',
-            ['[]'] = '@class.outer',
+        ['[M'] = '@function.outer',
+        ['[]'] = '@class.outer',
       },
     },
     swap = {
       enable = true,
       swap_next = {
-            ['<leader>a'] = '@parameter.inner',
+        ['<leader>a'] = '@parameter.inner',
       },
       swap_previous = {
-            ['<leader>A'] = '@parameter.inner',
+        ['<leader>A'] = '@parameter.inner',
       },
     },
   },
 }
 
 -- Diagnostic keymaps
-vim.keymap.set('n', 'Ü', vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
-vim.keymap.set('n', 'ü', vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
-vim.keymap.set('n', '<leader>ä', vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
-vim.keymap.set('n', '<leader>Ä', vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
+vim.keymap.set('n', 'Ü', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
+vim.keymap.set('n', 'ü', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
+vim.keymap.set('n', '<leader>ä', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
+vim.keymap.set('n', '<leader>Ä', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
 -- LSP settings.
 --  This function gets run when an LSP connects to a particular buffer.
@@ -496,13 +503,15 @@ local servers = {
 }
 
 -- nvim-tree setup
-require('nvim-tree').setup({
+-- Change the color of the the +/- symbols in nvimtree
+vim.cmd [[ highlight NvimTreeIndentMarker guifg=#637AB0]]
+require('nvim-tree').setup {
   renderer = {
     icons = {
       glyphs = {
         folder = {
-          arrow_closed = "+", -- arrow when folder is closed
-          arrow_open = "-",   -- arror when folder is open
+          arrow_closed = '+', -- arrow when folder is closed
+          arrow_open = '-', -- arror when folder is open
         },
       },
     },
@@ -510,11 +519,11 @@ require('nvim-tree').setup({
   actions = {
     open_file = {
       window_picker = {
-        enable = false
-      }
-    }
+        enable = false,
+      },
+    },
   },
-})
+}
 
 -- Setup neovim lua configuration
 require('neodev').setup()
@@ -544,14 +553,13 @@ mason_lspconfig.setup_handlers {
 }
 
 local lspconfig = require 'lspconfig'
-lspconfig.rust_analyzer.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-  cmd = {
-    "rustup", "run", "stable", "rust-analyzer",
-  }
-}
-
+-- lspconfig.rust_analyzer.setup {
+--   capabilities = capabilities,
+--   on_attach = on_attach,
+--   cmd = {
+--     "rustup", "run", "stable", "rust-analyzer",
+--   }
+-- }
 
 -- nvim-cmp setup
 local cmp = require 'cmp'
@@ -566,16 +574,16 @@ cmp.setup {
     end,
   },
   mapping = cmp.mapping.preset.insert {
-        ["<C-k>"] = cmp.mapping.select_prev_item(), -- previous suggestion
-        ["<C-j>"] = cmp.mapping.select_next_item(), -- next suggestion
-        ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-        ['<C-f>'] = cmp.mapping.scroll_docs(4),
-        ['<C-Space>'] = cmp.mapping.complete {},
-        ['<CR>'] = cmp.mapping.confirm {
+    ['<C-k>'] = cmp.mapping.select_prev_item(), -- previous suggestion
+    ['<C-j>'] = cmp.mapping.select_next_item(), -- next suggestion
+    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete {},
+    ['<CR>'] = cmp.mapping.confirm {
       behavior = cmp.ConfirmBehavior.Replace,
       select = false,
     },
-        ['<Tab>'] = cmp.mapping(function(fallback)
+    ['<Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
       elseif luasnip.expand_or_jumpable() then
@@ -584,7 +592,7 @@ cmp.setup {
         fallback()
       end
     end, { 'i', 's' }),
-        ['<S-Tab>'] = cmp.mapping(function(fallback)
+    ['<S-Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
       elseif luasnip.jumpable(-1) then
@@ -603,32 +611,17 @@ cmp.setup {
 }
 
 -- inlay-hints
-local ih = require('inlay-hints')
-ih.setup({
+local ih = require 'inlay-hints'
+ih.setup {
   only_current_line = false,
   eol = {
     right_align = true,
   },
-})
+}
 
 -- rust-tools
-local rt = require('rust-tools')
-rt.setup({
-  server = {
-    settings = {
-          ["rust-analyzer"] = {
-        checkOnSave = {
-          command = "clippy"
-        },
-      },
-    },
-    on_attach = function(_, bufnr)
-      -- Hover actions
-      vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
-      -- Code action groups
-      vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
-    end,
-  },
+local rt = require 'rust-tools'
+rt.setup {
   tools = {
     runnables = {
       use_telescope = true,
@@ -640,17 +633,107 @@ rt.setup({
       auto = true,
     },
   },
-})
+  server = {
+    settings = {
+      ['rust-analyzer'] = {
+        checkOnSave = {
+          command = 'clippy',
+        },
+      },
+    },
+    on_attach = function(_, bufnr)
+      -- Show diagnostic popup on cursor hover
+      local diag_float_grp = vim.api.nvim_create_augroup('DiagnosticFloat', {
+        clear = true,
+      })
+      vim.api.nvim_create_autocmd('CursorHold', {
+        callback = function()
+          vim.diagnostic.open_float(nil, { focusable = false })
+        end,
+        group = diag_float_grp,
+      })
 
-local autopairs = require('nvim-autopairs')
-autopairs.setup({
-  check_ts = true,                      -- enable treesitter
-  ts_config = {
-    lua = { "string" },                 -- don't add pairs in lua string treesitter nodes
-    javascript = { "template_string" }, -- don't add pairs in javascript template_string
-    java = false,                       -- don't check treesitter on java
+      -- Have a fixed column for the diagnostics to appear insert
+      -- This removes the jitter when warnings/errors flow in
+      vim.wo.signcolumn = 'yes'
+
+      -- Set updatetime for CursorHold
+      -- 300ms of no cursor movement to trigger CursorHold
+      vim.opt.updatetime = 100
+
+      -- Hover actions
+      vim.keymap.set('n', '<C-space>', rt.hover_actions.hover_actions, { buffer = bufnr })
+
+      -- Code action groups
+      vim.keymap.set('n', '<Leader>a', rt.code_action_group.code_action_group, { buffer = bufnr })
+    end,
   },
-})
+}
+
+-- LSP Diagnostics Options Setup
+local sign = function(opts)
+  vim.fn.sign_define(opts.name, {
+    texthl = opts.name,
+    text = opts.text,
+    numhl = '',
+  })
+end
+
+sign { name = 'DiagnosticSignError', text = '' }
+sign { name = 'DiagnosticSignWarn', text = '' }
+sign { name = 'DiagnosticSignHint', text = '' }
+sign { name = 'DiagnosticSignInfo', text = '' }
+
+local autopairs = require 'nvim-autopairs'
+autopairs.setup {
+  check_ts = true, -- enable treesitter
+  ts_config = {
+    lua = { 'string' }, -- don't add pairs in lua string treesitter nodes
+    javascript = { 'template_string' }, -- don't add pairs in javascript template_string
+    java = false, -- don't check treesitter on java
+  },
+}
+
+-- Fixed column for diagnostics to appear
+-- Show autodiagnostic popup on cursor hover_range
+-- Goto previous / next diagnostic warning / error
+-- Show inlay_hints more frequently
+vim.cmd [[
+set signcolumn=yes
+autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
+]]
+
+local null_ls = require 'null-ls'
+local formatting = null_ls.builtins.formatting
+local diagnostics = null_ls.builtins.diagnostics
+local augroup = vim.api.nvim_create_augroup('LspFormatting', {})
+
+null_ls.setup {
+  sources = {
+    formatting.prettier,
+    formatting.stylua,
+    diagnostics.eslint_d,
+    formatting.rustfmt,
+  },
+  on_attach = function(current_client, bufnr)
+    if current_client.supports_method 'textDocument/formatting' then
+      vim.api.nvim_clear_autocmds { group = augroup, buffer = bufnr }
+      vim.api.nvim_create_autocmd('BufWritePre', {
+        group = augroup,
+        buffer = bufnr,
+        callback = function()
+          vim.lsp.buf.format {
+            filter = function(client)
+              -- only use null-ls for formatting instead of lsp server
+              return client.name == 'null-ls'
+            end,
+            bufnr = bufnr,
+          }
+        end,
+      })
+    end
+  end,
+}
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
