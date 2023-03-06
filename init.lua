@@ -198,6 +198,9 @@ require('lazy').setup({
   { 'simrat39/rust-tools.nvim' },
   { 'simrat39/inlay-hints.nvim' },
 
+  -- Auto pairs brackets
+  { 'windwp/nvim-autopairs' },
+
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -612,6 +615,13 @@ ih.setup({
 local rt = require('rust-tools')
 rt.setup({
   server = {
+    settings = {
+          ["rust-analyzer"] = {
+        checkOnSave = {
+          command = "clippy"
+        },
+      },
+    },
     on_attach = function(_, bufnr)
       -- Hover actions
       vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
@@ -632,7 +642,15 @@ rt.setup({
   },
 })
 
-
+local autopairs = require('nvim-autopairs')
+autopairs.setup({
+  check_ts = true,                      -- enable treesitter
+  ts_config = {
+    lua = { "string" },                 -- don't add pairs in lua string treesitter nodes
+    javascript = { "template_string" }, -- don't add pairs in javascript template_string
+    java = false,                       -- don't check treesitter on java
+  },
+})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
