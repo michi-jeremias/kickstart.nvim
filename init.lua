@@ -98,10 +98,11 @@ require('lazy').setup({
     -- Autocompletion
     'hrsh7th/nvim-cmp',
     dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' },
-    -- from josean
-    'hrsh7th/cmp-buffer',
-    'hrsh7th/cmp-path',
+    -- This is a source for autocompletion, from the josean video
   },
+  -- Additional sources for cmp
+  'hrsh7th/cmp-buffer',
+  'hrsh7th/cmp-path',
 
   { -- File tree
     'nvim-tree/nvim-tree.lua',
@@ -490,7 +491,7 @@ local servers = {
   -- clangd = {},
   -- gopls = {},
   -- pyright = {},
-  rust_analyzer = {},
+  -- rust_analyzer = {},
   taplo = {},
   -- tsserver = {},
 
@@ -552,15 +553,6 @@ mason_lspconfig.setup_handlers {
   end,
 }
 
-local lspconfig = require 'lspconfig'
--- lspconfig.rust_analyzer.setup {
---   capabilities = capabilities,
---   on_attach = on_attach,
---   cmd = {
---     "rustup", "run", "stable", "rust-analyzer",
---   }
--- }
-
 -- nvim-cmp setup
 local cmp = require 'cmp'
 local luasnip = require 'luasnip'
@@ -605,7 +597,7 @@ cmp.setup {
   sources = {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
-    -- { name = 'buffer' }, -- text within current buffer
+    { name = 'buffer' }, -- text within current buffer
     -- { name = 'path' },   -- file system paths
   },
 }
@@ -638,6 +630,9 @@ rt.setup {
       ['rust-analyzer'] = {
         checkOnSave = {
           command = 'clippy',
+        },
+        diagnostics = {
+          disabled = { 'unresolved-method' },
         },
       },
     },
